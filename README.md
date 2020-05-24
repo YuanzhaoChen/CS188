@@ -13,6 +13,15 @@
   - Markov Decision Processes
   - Reinforcement Learning
   - Probability
+  - Bayes' Nets
+  - Decision Networks and Value of Information
+  - Hidden Markov Models
+  - Naive Bayes
+  - ML: Perceptrons and Logistic Regression 
+  - ML: Optimization and Neural Networks 
+  - ML: Neural Networks II and Decision Trees
+  - Robotics / Language / Vision
+  - Advanced Topics and Final Contest
 - Section
 - Homework
 - Project
