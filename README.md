@@ -2,7 +2,7 @@
 
 [Introduction to Artificial Intelligence at Berkeley](https://inst.eecs.berkeley.edu/~cs188/fa18/index.html)
 
-## Table of contents 
+## Table of contents
 
 - Lecture Topics
   - Intro to AI
@@ -12,8 +12,8 @@
   - Game Trees
   - Markov Decision Processes
   - Reinforcement Learning
-  - Probability
-  - Bayes' Nets
+  - [Probability](summary/probability.md) :white_check_mark:
+  - [Bayes' Nets](summary/bayes_nets.md)
   - Decision Networks and Value of Information
   - Hidden Markov Models
   - Naive Bayes
@@ -21,15 +21,14 @@
   - ML: Optimization and Neural Networks 
   - ML: Neural Networks II and Decision Trees
   - Robotics / Language / Vision
-  - Advanced Topics and Final Contest
+  - Advanced Topics and Final Contest 
 - Section
 - Homework
 - Project
   - P0 Tutorial
-  - P1 Search
+  - P1 Search      
   - P2 Games
   - P3 RL
   - P4 Ghostbusters
   - P5 Machine Learning
 - Readings
-
