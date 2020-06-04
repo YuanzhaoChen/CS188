@@ -20,7 +20,6 @@
 
   
 
-
 [Back](../README.md)
 
 [Next topic: Bayes' Nets](bayes_nets.md)
@@ -78,7 +77,7 @@ A probabilistic model is a joint distribution over a set of random variables
 - Marginal distributions are **sub-tables** which **eliminate variables**
 - Maginalization (summing out): combine collapsed rows by adding
 
-<img src="image/l12p1.PNG" style="zoom: 50%;" />
+<img src="image/l12p1.png" style="zoom: 50%;" />
 
 ---
 
@@ -111,3 +110,4 @@ Conditional distributions are probability distributions over some variables give
 ---
 
 [Next topic: Bayes' Nets](bayes_nets.md)
+

@@ -57,7 +57,9 @@ $\forall x,y,z: P(x|z,y)=P(x|z)$
 
 **Conditional Independence and the Chain Rule**
 
-Chain rule: $P(X_1,X_2,...X_n)=P(X_1)P(X_2|X_1)P(X3|X_1,X_2)...$
+Chain rule: 
+
+$P(X_1,X_2,...X_n)=P(X_1)P(X_2|X_1)P(X3|X_1,X_2)...=\prod_{i=1}^{n}P(X_i|X_1,...X_{i-1})$
 
 Trivia decomposition:
 
@@ -70,6 +72,21 @@ $P(Traffic,Rain,Umbrella)=P(Rain)P(Traffic|Rain)P(Umbrella|Rain)$
 ---
 
 ### Bayes' Nets Representation
+
+**Two problems with using full joint distribution tables as out probabilistic models**
+
+1. Unless there are only a few variables, the joint is way too big to represent explicitly
+2. Hard to learn (estimate) anything empirically about more than a few variables at a time
+
+**Bayes' nets**: a technique for describing complex joint distributions (models) using simple, local distributions (conditional probabilities)
+
+- More properly called **graph models**
+- We describe how variables locally interact
+- Local interactions chain together to give global , indirect interactions
+
+**Nodes**: variables with domain, can be observed or unobserved
+
+**Arcs**: interactions, similar to CSP constraints, indicate "direct influence" between variables
 
 ---
 
