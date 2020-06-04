@@ -12,8 +12,8 @@
   - Game Trees
   - Markov Decision Processes
   - Reinforcement Learning
-  - [Probability](summary/probability.md) :white_check_mark:
-  - [Bayes' Nets](summary/bayes_nets.md)
+  - Probability
+  - Bayes' Nets
   - Decision Networks and Value of Information
   - Hidden Markov Models
   - Naive Bayes
