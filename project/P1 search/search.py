@@ -87,17 +87,81 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    route = []
+    currRoute = []
+    visitedState = set()
+    visitedState.add(problem.getStartState())
+    depthFirstSearch_helper(problem, problem.getSuccessors(problem.getStartState()), currRoute, route, visitedState)
+    return route
+
+def depthFirstSearch_helper(problem, successors, currRoute, route, visitedState):
+    for currState,action,cost in successors:
+        if currState in visitedState:
+            continue
+        currRoute.append(action)
+        visitedState.add(currState)
+        if problem.isGoalState(currState): #If we find a goal, immediately return
+            for action in currRoute:
+                route.append(action)
+            return True
+        retval = depthFirstSearch_helper(problem, problem.getSuccessors(currState), currRoute, route, visitedState)
+        if retval is True:  #Exit searching if a solution is found
+            return True
+        currRoute.pop()     #If we reach to this line it means no solution goes through currState, so pop it out
+    return False            #If we reach to this line it means solution doesn't live in any of the successors above
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Queue
+    visitedState = set()
+    visitedState.add(problem.getStartState())
+    stateQueue = Queue()
+    stateQueue.push(problem.getStartState())
+    routeQueue = Queue()
+    routeQueue.push([])
+    while not stateQueue.isEmpty():
+        currState = stateQueue.pop()
+        currRoute = routeQueue.pop()
+        if problem.isGoalState(currState):
+            return currRoute
+        successors = problem.getSuccessors(currState)
+        for i in range(len(successors)):
+            nextState,action,cost = successors[i]
+            if nextState not in visitedState:
+                visitedState.add(nextState)
+                stateQueue.push(nextState)
+                newRoute = currRoute.copy()
+                newRoute.append(action)
+                routeQueue.push(newRoute)
+    return None
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue, Queue
+    startState = problem.getStartState()
+    route = []
+    visitedState = set()
+    visitedState.add(startState)
+    pq = PriorityQueue()
+    #expand start state into priority queue
+    for nextState,action,cost in problem.getSuccessors(startState):
+        currRoute = []
+        currRoute.append(action)
+        pq.push((nextState,currRoute,cost),cost)
+    #put the rest of the states into queue
+    while not pq.isEmpty():
+        state,currRoute,cost = pq.pop()
+        if problem.isGoalState(state):
+            return currRoute
+        if state not in visitedState:
+            visitedState.add(state)
+            for newState,newAction,newCost in problem.getSuccessors(state):
+                newRoute = currRoute.copy()
+                newRoute.append(newAction)
+                pq.push((newState,newRoute,cost+newCost),cost+newCost) #keep in mind this is cumulative cost
+    return None
 
 def nullHeuristic(state, problem=None):
     """
@@ -109,7 +173,29 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from searchAgents import manhattanHeuristic
+    from util import PriorityQueue, Queue
+    startState = problem.getStartState()
+    visitedState = set()
+    visitedState.add(startState)
+    pq = PriorityQueue()
+    #expand start state into priority queue
+    for nextState,action,cost in problem.getSuccessors(startState):
+        currRoute = []
+        currRoute.append(action)
+        pq.push((nextState,currRoute,cost),cost+heuristic(nextState,problem))
+    #put the rest of the states into queue
+    while not pq.isEmpty():
+        state,currRoute,cost = pq.pop()
+        if problem.isGoalState(state):
+            return currRoute
+        if state not in visitedState:
+            visitedState.add(state)
+            for newState,newAction,newCost in problem.getSuccessors(state):
+                newRoute = currRoute.copy()
+                newRoute.append(newAction)
+                pq.push((newState,newRoute,cost+newCost),cost+newCost+heuristic(newState,problem)) #keep in mind this is cumulative cost
+    return None
 
 
 # Abbreviations

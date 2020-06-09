@@ -1,4 +1,6 @@
 .DS_Store
 __pycache__
 summary/
+lecture/
+.vscode
 lecture24_advanced_applications_robotics.pdf
