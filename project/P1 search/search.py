@@ -124,7 +124,6 @@ def breadthFirstSearch(problem):
         currState = stateQueue.pop()
         currRoute = routeQueue.pop()
         if problem.isGoalState(currState):
-            print(currRoute,len(currRoute))
             return currRoute
         successors = problem.getSuccessors(currState)
         for i in range(len(successors)):
