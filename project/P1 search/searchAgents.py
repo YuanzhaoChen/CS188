@@ -295,14 +295,18 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        startPosition = self.startingPosition
+        visitedCorners = set()
+        if startPosition in self.corners:
+            visitedCorners.add(startPosition)
+        return (startPosition,tuple(visitedCorners))   
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return len(state[1])==len(self.corners) 
 
     def getSuccessors(self, state):
         """
@@ -325,6 +329,16 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                nextVisitedCorners = set(state[1])
+                if (nextx,nexty) in self.corners and (nextx,nexty) not in state[1]:
+                    nextVisitedCorners.add((nextx,nexty))
+                nextState = ((nextx,nexty),tuple(nextVisitedCorners))
+                successors.append((nextState,action,1)) #assume cost is always 1
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,7 +374,16 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # corners heuristics here is the max manhattan distance between current position and furthest corner
+    from util import manhattanDistance
+    estDistance = 0;
+    for corner in corners:
+        if corner in state[1]: 
+            continue
+        estDistance = max(estDistance,manhattanDistance(state[0],corner))
+    return estDistance
+
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
