@@ -67,11 +67,11 @@ class MyAgent2(Agent):
             return self.actionBuff.pop()
         problem = AnyFoodSearchProblem(state, self.index) 
         route = self.customBfs(problem,state)
-        if route is None: # all dots in the segment are collected
+        if route is None: # all dots in the corresponding segment are collected
             self.finishCollect = True
-            route = self.customBfs(problem,state)
-        #fill up buffer
-        for step in route:
+            # search again, this time allow agent to collect other segments' dots
+            route = self.customBfs(problem,state)                
+        for step in route: # fill up action buffer 
             self.actionBuff.push(step)
         return self.actionBuff.pop()
     
@@ -82,8 +82,8 @@ class MyAgent2(Agent):
         leave it blank
         """
         "*** YOUR CODE HERE"  
-        self.finishCollect=False
-        self.actionBuff=util.Queue()
+        self.finishCollect = False
+        self.actionBuff = util.Queue()
 
 """
 Strategy: 
@@ -127,11 +127,10 @@ class MyAgent(Agent):
             return self.actionBuff.pop()
         problem = AnyFoodSearchProblem(state, self.index) 
         route = self.customBfs(problem,state)
-        if route is None: # all dots in the segment are collected
+        if route is None: # all dots in the correspondig segment are collected, agent should stop
             self.finishCollect = True
             return Directions.STOP
-        #fill up buffer
-        for step in route:
+        for step in route: # fill up buffer
             self.actionBuff.push(step)
         return self.actionBuff.pop()
     
@@ -166,7 +165,6 @@ class ClosestDotAgent(Agent):
         return search.breadthFirstSearch(problem)
 
     def getAction(self, state):
-        #print('index: ',self.index,' state: ',state.getPacmanState(self.index))
         return self.findPathToClosestDot(state)[0]
 
 class AnyFoodSearchProblem(PositionSearchProblem):
