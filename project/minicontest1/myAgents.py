@@ -69,7 +69,7 @@ class MyAgent2(Agent):
         route = self.customBfs(problem,state)
         if route is None: # all dots in the segment are collected
             self.finishCollect = True
-            return Directions.STOP
+            route = self.customBfs(problem,state)
         #fill up buffer
         for step in route:
             self.actionBuff.push(step)
