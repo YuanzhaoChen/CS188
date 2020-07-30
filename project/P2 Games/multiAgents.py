@@ -131,6 +131,7 @@ class MultiAgentSearchAgent(Agent):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
+        self.funcType = evalFn
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -277,35 +278,38 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     Return best value and the corresponding action of a game state
     """
     @staticmethod
-    def computeExpectimax(agentIndex, gameState, remainSteps):
+    def computeExpectimax(agentIndex, gameState, remainSteps, funcType):
         if gameState.isWin() or gameState.isLose() or remainSteps==0:
-            return scoreEvaluationFunction(gameState), Directions.STOP
+            if funcType == 'scoreEvaluationFunction':
+                return scoreEvaluationFunction(gameState), Directions.STOP
+            else: 
+                return betterEvaluationFunction(gameState), Directions.STOP
         if ExpectimaxAgent.isPacman(agentIndex):
-            return ExpectimaxAgent.computeMax(agentIndex, gameState, remainSteps)
+            return ExpectimaxAgent.computeMax(agentIndex, gameState, remainSteps, funcType)
         else:
-            return ExpectimaxAgent.computeExpectation(agentIndex, gameState, remainSteps)
+            return ExpectimaxAgent.computeExpectation(agentIndex, gameState, remainSteps, funcType)
     
     @staticmethod
-    def computeMax(agentIndex, gameState, remainSteps):
+    def computeMax(agentIndex, gameState, remainSteps, funcType):
         v = -math.inf
         a = Directions.STOP
         successorIndex = (agentIndex+1)%gameState.getNumAgents()
         for action in gameState.getLegalActions(agentIndex):
             successorGameState = gameState.generateSuccessor(agentIndex, action)
-            s = ExpectimaxAgent.computeExpectimax(successorIndex, successorGameState, remainSteps-1)
+            s = ExpectimaxAgent.computeExpectimax(successorIndex, successorGameState, remainSteps-1, funcType)
             if v < s[0]:
                 v = s[0]
                 a = action
         return v,a
 
     @staticmethod
-    def computeExpectation(agentIndex, gameState, remainSteps):
+    def computeExpectation(agentIndex, gameState, remainSteps, funcType):
         v = 0
         cnt = 0
         successorIndex = (agentIndex+1)%gameState.getNumAgents()
         for action in gameState.getLegalActions(agentIndex):
             successorGameState = gameState.generateSuccessor(agentIndex, action)
-            s = ExpectimaxAgent.computeExpectimax(successorIndex, successorGameState, remainSteps-1)
+            s = ExpectimaxAgent.computeExpectimax(successorIndex, successorGameState, remainSteps-1, funcType)
             v += s[0]
             cnt += 1
         return v/cnt, Directions.STOP # expectation node does not pick action, just assignment an arbitrary action to ensure correct syntax
@@ -318,8 +322,30 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        value, action = ExpectimaxAgent.computeExpectimax(self.index, gameState, self.depth*gameState.getNumAgents())
+        funcType = self.funcType
+        value, action = ExpectimaxAgent.computeExpectimax(self.index, gameState, self.depth*gameState.getNumAgents(),funcType)
         return action
+
+def findClosestFoodDist(gameState):
+    stateQueue = util.Queue()
+    prevFoodNum = gameState.getFood().count()
+    stateQueue.push((gameState,0,prevFoodNum))
+    seenState = set()
+    seenState.add(    ( gameState.getPacmanPosition(), gameState.getFood(), 0 )   )
+    while not stateQueue.isEmpty():
+        currState, dst, prevFoodNum = stateQueue.pop()
+        x,y = currState.getPacmanPosition()
+        currFoodNum = currState.getFood().count()
+        if currFoodNum < prevFoodNum:
+            return dst
+        if currFoodNum == 0:
+            return 0
+        for action in currState.getLegalActions(0):
+            successorState = currState.generateSuccessor(0,action)
+            if (successorState.getPacmanPosition(), successorState.getFood(),  dst+1) not in seenState:
+                seenState.add( (successorState.getPacmanPosition(),successorState.getFood(),dst+1)   )
+                stateQueue.push((successorState, dst+1, currFoodNum))
+    return 0
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -328,40 +354,17 @@ def betterEvaluationFunction(currentGameState):
 
     DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    """ Strategy:
-    1) Distance metric: compute difference of total distance to foods in new state and current state
-        and take reciprocal
-    2) Ghost metric: distance to ghost
-    3) evaluationFuction: distance metric + ghost metric
-    """
-    successorGameState = currentGameState.generatePacmanSuccessor(action)
-    newPos = successorGameState.getPacmanPosition()
-    newFood = successorGameState.getFood()
-    newGhostStates = successorGameState.getGhostStates()
-    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-
-    currentPos = currentGameState.getPacmanPosition()
-    currentFood = currentGameState.getFood()
-    
-    newDistanceToFoods = 0
-    for x in range(newFood.width):
-        for y in range(newFood.height):
-            if newFood[x][y]:
-                newDistanceToFoods += math.sqrt(math.pow(newPos[0]-x, 2) + math.pow(newPos[1]-y, 2))
-    foodMetric = 1/abs(1+newDistanceToFoods)
-
+    currPos = currentGameState.getPacmanPosition()
+    foodMetric = 1/(1+findClosestFoodDist(currentGameState))
     distanceToGhosts = 0
-    for ghostState in newGhostStates:
+    for ghostState in currentGameState.getGhostStates():
         ghostPosition = ghostState.getPosition()
-        distanceToGhosts += math.sqrt(math.pow(newPos[0]-ghostPosition[0],2) + math.pow(newPos[1]-ghostPosition[1],2))
-    if distanceToGhosts > math.sqrt(4):
+        distanceToGhosts += math.sqrt(math.pow(currPos[0]-ghostPosition[0],2) + math.pow(currPos[1]-ghostPosition[1],2))
+    if distanceToGhosts > 2:
         ghostMetric = 0
     else:
         ghostMetric = -abs(foodMetric)*2
-    if action == Directions.STOP:
-        return -100
-    return successorGameState.getScore() + foodMetric + ghostMetric
+    return currentGameState.getScore() + foodMetric + ghostMetric
 
 # Abbreviation
 better = betterEvaluationFunction
